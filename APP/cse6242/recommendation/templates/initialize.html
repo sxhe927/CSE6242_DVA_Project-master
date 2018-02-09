@@ -1,0 +1,137 @@
+{% extends "base.html"%}
+{% load extra %}
+{% block title %}Model Initialization{% endblock %}
+{% block content %}
+
+    <div class="container">
+        <div class = "row">
+             <p> Welcome to the model initialization page. Here you can bulk import structured data to the database. </p>   
+            <div class = "col-md-6">
+                <div class="row">
+                    <div class="col-sm">
+                        <h3>Essence</h3>
+                        <form action="{% url 'initialize' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% if not essences.all %} 
+                                <p>This model is currently empty.</p>
+                                <p>Please upload a python list of essence names essence.</p>
+                                <p>
+                                    {{ form.file.errors }}
+                                    {{ form.file }}
+                                </p>
+                                <p><input type="submit" name="essence" value="submit" /></p>
+                            {% else %}
+                                <p>There are currently {% size essences %} records in this model.
+                                <input type="submit" name="essence-reset" value="reset" /></p>
+                                <p>Please upload essence types. </p>
+                                <p>
+                                    {{ form.file.errors }}
+                                    {{ form.file }}
+                                </p>
+                                <p><input type="submit" name="essence-type" value="submit" /></p>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm">
+                        <h3>Compounds</h3>
+                        <form action="{% url 'initialize' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% if not compounds.all %} 
+                                <p>This model is currently empty.</p>
+                                <p>Please upload a python dictionary flavor_dict with compound names mached it's entry information.</p>
+                                <p>
+                                    {{ form.file.errors }}
+                                    {{ form.file }}
+                                </p>
+                                <p><input type="submit" name="compound" value="submit" /></p>
+                            {% else %}
+                                <p>There are currently {% size compounds %} records in this model.
+                                <input type="submit" name="compound-reset" value="reset" /></p>
+
+                                {% if essences.all %}
+                                    <p>Current Compound Coverage: {% compound_coverage %} 
+                                    <input type="submit" name="match-compound" value="match compound" /></p>
+                                {% endif %}
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm">
+                        <h3>Ingredients</h3>
+                        <form action="{% url 'initialize' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% if not ingredients.all %} 
+                                <p>This model is currently empty.</p>
+                                <p>Please upload a python dictionary ingredient_dict with ingredient id and names.</p>
+                                <p>
+                                    {{ form.file.errors }}
+                                    {{ form.file }}
+                                </p>
+                                <p><input type="submit" name="ingredient" value="submit" /></p>
+                            {% else %}
+                                <p>There are currently {% size ingredients %} records in this model.
+                                <input type="submit" name="ingredient-reset" value="reset" /></p>
+                                {% if essences.all %}
+                                    <p>Current Essence Coverage: {% essence_coverage %}  <input type="submit" name="match-essence" value="match essence" /></p>
+                                {% endif %}
+                                
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">
+                        <h3>Recipes</h3>
+                        <form action="{% url 'initialize' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% if not recipes.all %} 
+                                <p>This model is currently empty.</p>
+                                <p>Please upload recipe dump file.</p>
+                                <p>
+                                    {{ form.file.errors }}
+                                    {{ form.file }}
+                                </p>
+                                <p><input type="submit" name="recipe" value="submit" /></p>
+                            {% else %}
+                                <p>There are currently {% size recipes %} records in this model.
+                                <input type="submit" name="recipe-reset" value="reset" /></p>
+                                {% if ingredients.all %}
+                                    <p>Current Ingredient Coverage: {% ingredient_coverage %}  <input type="submit" name="match-ingredient" value="match ingredient" /></p>
+                                {% endif %}
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            <div class = "col-md-6">
+                <div class="row">
+                    <div class="col-sm">
+                        <h3>PMI</h3>
+                        <form action="{% url 'initialize' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="submit" name="PMI" value="Calculate PMI" /></p>
+                            <input type="submit" name="PMI-reset" value="Reset PMI" /></p>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">
+                        <h3>Ingredient Frequency</h3>
+                        <form action="{% url 'initialize' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="submit" name="freq" value="Calculate Frequency" /></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends "base.html"%}
+{% load extra %}
+{% load static %}
+{% block title %}App{% endblock %}
+{% block content %}
+<div class="container">
+
+</div>
+<br/>
+
+<div id="ingredient_tab" class="container"> 
+    <div class = "row">
+        <div class="col-md-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3><i class="fa fa-search" aria-hidden="true"></i> Input an ingredient</h3>
+                    <input id="selected" list="browsers" name="browser" class="ingredient_input_box">
+                        <datalist id="browsers" class="datalist scrollable">
+                        </datalist>
+                    <input id="submit" type="submit" class="btn btn-primary btn-md">
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class = "col-md-4">
+                    <ul  class="nav nav-pills nav-stacked {{type.id}}-bgc">
+                    {% for type in results %}
+                        <li> <a href = "#{{type.id}}" data-toggle="tab" class= "ingred-type {{type.id}}-c"> <b> {{type.name}}</b> </a> </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                <div class = "col-md-8">
+                    <div class="tab-content clearfix">
+                        {% for type in results %}
+                            <div class="tab-pane" id="{{type.id}}">
+                                {% for x in type.recommendations %}
+                                    <p> <span class="rounded-text-i ingredient {{type.id}}-bgc" id="ingred-{{x.id}}" value = "{{x.essence}}">{{x.name}}</span> <span class="rounded-text-f" data-html="true" data-placement="right" data-toggle="tooltip" title = "{% get_comp_title x.compounds %}">{% size x.compounds %}</span> </p>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class = "row">
+                <div class = "col-md-12">
+                    <h3 class = "cart-title"><i class="fa fa-shopping-basket"></i> Shopping Basket <i class="fa fa-trash" aria-hidden="true" id="clear-cart"></i> </h3>
+                    <div id = "cart"> </div>
+                    <input type="submit" id="get-recipe" value="Get Recipes" class="btn btn-primary btn-md recipe-btn"/>
+                </div>
+            </div>
+        </div>
+        <div class = "col-md-7">
+            <h3><i class="fa fa-magic" aria-hidden="true"></i> Flavor Network
+            </h3>
+            <input type="text" id="threshold-input"  value="" class="ingredient_input_box" style="" placeholder="Edge threshold, default 20. " />
+            <button onclick="updateGraphTrigger('threshold-input')" id="update-graph-btn" class="btn btn-primary">Update Graph</button>
+            <div id = "graph"></div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="{% static 'recommendation/js/d3.v3.min.js' %}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'recommendation/js/graph.js' %}"></script>
+<script>
+var ingred_id_list = {{ingred_id_list|safe}};
+var graph_nodes = {{graph_nodes|safe}}
+var source_essence = {{source_essence|safe}}
+var source_id;
+
+$(document).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip(); 
+    url = window.location.href;
+    if (url.includes('source_id')) {
+        source_id = url.split("?")[1].split('=')[1];
+        $('#selected').val(source_id.split('-')[0].replace('%20',' '));
+    }
+    
+    $.each(ingred_id_list, function(i, p) {
+        $('#browsers').append($('<option></option>').val(p[0]).attr('data-value',p[1]));
+    });
+    var data = {};
+    $("#browsers option").each(function(i,el) {  
+       data[$(el).data("value")] = $(el).val();
+});
+//console.log(data, $("#browsers option").val());
+$('#submit').click(function(){
+        var value = $('#selected').val();
+        source_id = $('#browsers [value="' + value + '"]').val() + '-' + $('#browsers [value="' + value + '"]').data('value');
+        window.location.href = window.location.href.split('?')[0]+'?source_id='+source_id;
+    });
+});
+cart = [];
+
+$('.ingredient').click(function(data){
+    id = data.currentTarget.id;
+    if (cart.includes(id)){
+        removeFromCart(id);
+    } else {
+        addToCart(id);
+    }
+    updateCart();
+});
+
+function addToCart(id) {
+    x = $('#'+ id).addClass("selected");
+    cart.push(id);
+    console.log(x);
+}
+
+function removeFromCart(id) {
+    $('#'+ id).removeClass("selected");
+    cart.splice(cart.indexOf(id),1);
+}
+
+function updateCart() {
+    $('#cart').empty();
+    $('circle').removeClass("in-cart-c");
+    $('path').removeClass("in-cart-l");
+    elist = [];
+    for (var i = 0; i < cart.length; i++) {
+        $('<p></p>').append($('#'+cart[i]).clone().attr('id',id+'-cart').toggleClass("selected")).appendTo('#cart');
+        x = $('#'+cart[i])
+        l = x.attr('value').split(',');
+        for (var j=0; j< l.length; j++) {
+            if (!elist.includes(l[j])) {
+                elist.push(l[j]);
+            }
+        }
+    }
+    for (var i=0; i < elist.length; i++) {
+        c = $('#c-'+elist[i]).addClass("in-cart-c");
+    }
+    elist= elist.concat(source_essence)
+    for (var i=0; i < elist.length; i++) {
+        for (var j=0; j< elist.length; j++) {
+            if (i != j) {
+                selector = '.'+elist[i].split(' ').join('-') + '.'+elist[j].split(' ').join('-');
+                console.log(selector)
+                $(selector).addClass("in-cart-l")
+            }
+        }
+    }
+}
+
+$('#get-recipe').click(function(){
+        return_array = cart.map(function(e){
+            var l = e.split('-');
+            return l[l.length -1];
+        })
+        window.location.href = window.location.origin+'/recommendation/recipes/?r_ids='+return_array.join(',')+'&source_id='+source_id.split('-')[source_id.split('-').length-1];
+});
+
+$('#clear-cart').click(function(){
+    cart=[];
+    updateCart();
+});
+var threshold = 10;
+
+
+function getNodes(lks){
+    var ns = {};
+    lks.forEach(function(lk) {
+        lk.source = ns[lk.source] || (ns[lk.source] = {name: lk.source});
+        lk.target = ns[lk.target] || (ns[lk.target] = {name: lk.target});
+    });
+    return ns;
+}
+
+
+function getLinks(links,nodes,threshold){
+    for (var val in nodes){
+        if (!graph_nodes.includes(nodes[val].name) && !source_essence.includes(nodes[val].name)) {
+            delete nodes[val];
+            for (var i = links.length -1; i >=0; i--) {
+              if (links[i].source.name == val || links[i].target.name == val || links[i].value <= threshold) {
+                links.splice(i,1);
+              }
+            }
+        }
+    }
+    var root = nodes[source_essence[0]];
+    if (root != undefined) {
+        root.fixed = true;
+        root.x = 600-20;
+        root.y = 600-20;
+    }
+    return links;
+}
+
+updateGraph(20);
+
+function updateGraph(threshold) {
+    $('#graph').empty();
+    var listcopy = JSON.parse(JSON.stringify(LINKS));
+    var nodes = getNodes(listcopy);
+    var lks = getLinks(listcopy,nodes,threshold);
+    drawGraph(lks,nodes,FREQ);
+
+}
+
+function updateGraphTrigger(id) {
+    var threshold = $('#'+id).val();
+    updateGraph(parseInt(threshold));    
+}
+
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,30 @@
+{% extends "base.html"%}
+{% load extra %}
+{% block title %}Recipe Recommendations{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="cart-title"> Try these out!  <a href = "{% url 'app' %}" title = "restart another experiment"> <i class="fa fa-undo" aria-hidden="true"></i> </a></h2>
+    <div class="row">
+        {% for r in recipes %}
+        <div class="col-md-3"> 
+            <a class='img-link' href= "{{r.source_url}}">
+                <div class="text-center">
+                    <img src = "{{r.image_url}}" class="img-rounded" alt="Cinque Terre" style="width:200px">
+                </div>
+                <p style="text-align: center"> {{r.name}} </p>
+            </a>
+        </div>
+            <!-- if last column in row -->
+            {% if forloop.counter|divisibleby:4 %}
+            </div><div class="row">
+            {% endif %}
+
+        {% endfor %}
+    </div>
+</div>
+<script>
+</script>
+{% endblock %}
+
+

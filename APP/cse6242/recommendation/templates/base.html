@@ -1,0 +1,48 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>{% block title %}the Flavor Lab{% endblock %}</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="{%static 'recommendation/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'recommendation/css/base.css' %}">
+  </head>
+  <body>
+    <div class = "container-fluid header">
+         <h1><i class="fa fa-flask" aria-hidden="true"></i><a href = "{% url 'index' %}"> Flavor Lab</a></h1>
+    </div>
+    {% block content %}
+        <table>
+          <tr>
+            <td class = "hh left-panel" id = "initialize">
+              <span class = "large-text"><i class="fa fa-cogs" aria-hidden="true"></i></span>
+              <h1>Initialize Model </h1>
+            </td>
+            <td class = "hh right-panel" id = "app">
+              <span class ="large-text"><i class="fa fa-star-o" aria-hidden="true"></i></span>
+              <h1> App</h1>
+            </td>
+          </tr>
+        </table>
+    {% endblock %}
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+      $('#initialize').click(function(){
+        window.location.href = window.location.origin+'/recommendation/initialize'
+      });
+      $('#app').click(function(){
+        window.location.href = window.location.origin+'/recommendation/app'
+      });
+    </script>
+  </body>
+</html>
