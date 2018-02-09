@@ -1,5 +1,5 @@
-# CSE6242_DVA_Project
-This is the repository for group project for CSE6242 Data&Visual Analytics. 
+# DVA_Project
+This is the repository for group project for Data&Visual Analytics. 
 
 # Data Extraction/Scraping Data
 You first need an API key from Spoonacular. 
